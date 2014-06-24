@@ -8,6 +8,42 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+
+void set_color (char ch){
+    switch(ch) {
+        case '1':
+            printf("\x1b[0;1;36m");     // high cyan
+            break;
+        case '2':
+            printf("\x1b[0;1;33m");     // high yellow
+            break;
+        case '3':
+            printf("\x1b[0;35m");       // low magenta
+            break;
+        case '4':
+            printf("\x1b[0;1;44m");     // white on blue
+            break;
+        case '5':
+            printf("\x1b[0;32m");       // low green
+            break;
+        case '6':
+            printf("\x1b[0;1;5;31m");   // high blinking red
+            break;
+        case '7':
+            printf("\x1b[0;1;34m");     // high blue
+            break;
+        case '8':
+            printf("\x1b[0;34m");       // low blue
+            break;
+        case '9':
+            printf("\x1b[0;36m");       // low cyan
+            break;
+        default:
+            printf("\x1b[0m");       // low grey
+    }
+}
+
+
 int main(int argc, char *argv[])
 {
 		char ch;
@@ -43,39 +79,16 @@ int main(int argc, char *argv[])
 				} else {
 				if (ch == 3 ) {
 						ch = getc(file);
-						switch(ch) {
-							case '1':
-								printf("\x1b[0;1;36m");     // high cyan 
-								break;
-							case '2':
-								printf("\x1b[0;1;33m");     // high yellow 
-								break;
-							case '3':
-								printf("\x1b[0;35m");       // low magenta 
-								break;
-							case '4':
-								printf("\x1b[0;1;44m");     // white on blue 
-								break;
-							case '5':
-								printf("\x1b[0;32m");       // low green 
-								break;
-							case '6':
-								printf("\x1b[0;1;5;31m");   // high blinking red 
-								break;
-							case '7':
-								printf("\x1b[0;1;34m");     // high blue 
-								break;
-							case '8':
-								printf("\x1b[0;34m");       // low blue 
-								break;
-							case '9':
-								printf("\x1b[0;36m");       // low cyan 
-								break;
-							default:
-								printf("\x1b[0m");       // low grey 
+						set_color(ch);
+				} else if ( ch == '|' ) {
+						ch = getc(file);
+						if (ch == '#' ) {
+							ch = getc(file);
+							set_color(ch);
+						} else {
+							printf("|%c",ch);
 						}
-				}
-				else {
+				} else {
 						printf("%c",ch);
 				}
 						usleep(10000000 / speed);
