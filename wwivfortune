@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+from struct import *
+from time import *
+from binascii import *
+import sys
+import subprocess
+import random
+subs_xtrfile="/home/xenos/alcove/C:/WWIV/DATA/subs.xtr"
+WWIVNET="/home/xenos/alcove/wwivnet/"
+
+def get_host(subname):
+  subs_xtr=open(subs_xtrfile,"r")
+  for line in subs_xtr:
+    if line[0]=="$":
+        network_info=line[1:-1].split(" ")
+        subtype=network_info[1]
+        host=network_info[3]
+        if subtype==subname:
+            return(int(host))
+  return(0)
+
+def writepacket(f,tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method,message):
+  wwivpacketformat = "<HHHHHHHIIH"
+  length=len(message)
+  daten=int(time())
+  #print(length)
+  #print(message)
+  packetout=pack(wwivpacketformat,tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method)
+  #print(packetout)
+  packetout=packetout+message
+  #print(packetout)
+  out=open(f,"a")
+  out.write(packetout)
+  out.close
+
+showmessage=0
+title="WWIV Fortune of the Day"
+mysys=60
+myuser=1
+# tosys should be the HOST of the SUB
+#sub="AAGEN"
+sub=raw_input("What SUB to post to? ")
+tosys=get_host(sub)
+title=title+"\0"
+sender="Xenos #1 @60 Aliens Alcove!"
+date=ctime()
+message=subprocess.check_output("fortune")
+message="\x034.-=-=-=-=-=-=-=-=-=-=-=-=-.\n\x034| WWIV Fortune of the Day |\n\x034`-=-=-=-=-=-=-=-=-=-=-=-=-'\n\n\x030"+message+"\n\n\x032This fortune cookie is brought to you by the letter '%s' and the number '%s'\n" % (random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),random.choice("0123456789"))+"\x030"
+message=message.replace("\n","\r\n")
+payload=sub+"\0"+title+sender+"\r\n"+date+"\r\n"+message+"\r\n"
+#print(payload)
+print("Posting to {}.".format(tosys))
+LOCAL=WWIVNET+"local.net"
+OUTBOUND=WWIVNET+"p0.net"
+writepacket(LOCAL,0,0,mysys,myuser,26,0,0,0,0,0,payload)
+writepacket(OUTBOUND,tosys,0,mysys,myuser,26,0,0,0,0,0,payload)
+subprocess.call("networkc")
+#subprocess.call("network1")
+
+
+#    a=input()
+
+  
+#\nfrom: %d@%d\ntype: %d.%d\nlist_len: %d\ndaten %d\nlength %d\nmethod %d\n" % tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method)
+
+#with open("local.net","bw") as f:
+#    pack(strformat,buffer)=tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method

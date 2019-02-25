@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+from struct import *
+from time import *
+from binascii import *
+import sys
+import subprocess
+
+# reconfigurable items
+subs_xtrfile="/home/xenos/alcove/C:/WWIV/DATA/subs.xtr"
+WWIVNET="/home/xenos/alcove/fsxnet/"
+# replace below with your node number etc.
+mysys=1
+myuser=1
+sub="FSX_DAT"
+
+
+def get_host(subname):
+  subs_xtr=open(subs_xtrfile,"r")
+  for line in subs_xtr:
+    if line[0]=="$":
+        network_info=line[1:-1].split(" ")
+        subtype=network_info[1]
+        host=network_info[3]
+        if subtype==subname:
+            return(int(host))
+  return(0)
+
+def writepacket(f,tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method,message):
+  # wwivpacketformat is the header format
+  wwivpacketformat = "<HHHHHHHIIH"
+  length=len(message)
+  daten=int(time())
+  packetout=pack(wwivpacketformat,tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method)
+  packetout=packetout+message
+  out=open(f,"a")
+  out.write(packetout)
+  out.close
+
+def rot47(s):
+  l=""
+  for i in s:
+    j=k=ord(i)
+    if (j>32) and (j<80):
+      k=j+47
+    if (j>79) and (j<127):
+      k=j-47
+    l+=chr(k)
+  return l
+
+showmessage=0
+title="ibbslastcall-data"
+# FTN hosts are usually just node 32675 or 32765 (in newer)
+# tosys should be the HOST of the SUB
+# We're hardcoding this for fsxNet's FSX_DAT sub for now
+#
+# eventually we'll use WWIVnet's own eprogs capability.
+#
+
+tosys=get_host(sub)
+title=title+"\0"
+sender="wwiv5ibbslastcall (21:4/147)"
+date=ctime()
+m=">>> BEGIN\n"
+m=m+rot47("Xenos #1")+"\n"
+m=m+rot47("Alien's Alcove! BBS")+"\n"
+m=m+rot47(strftime("%m/%d/%y"))+"\n"
+m=m+rot47(strftime("%H:%M:%S"))+"\n"
+m=m+rot47("Taguig City, Philippines")+"\n"
+m=m+rot47("Ubuntu GNU/Linux 18.04")+"\n"
+m=m+rot47("aliens.free.net.ph")+"\n"
+m=m+">>> END\n\n"
+m=m+"by wwiv5ibbslastcall"
+message=m.replace("\n","\r\n")
+payload=sub+"\0"+title+sender+"\r\n"+date+"\r\n"+message+"\r\n"
+print(payload)
+print("Posting to {}.".format(tosys))
+LOCAL=WWIVNET+"local.net"
+OUTBOUND=WWIVNET+"p0.net"
+writepacket(LOCAL,0,0,mysys,myuser,26,0,0,0,0,0,payload)
+writepacket(OUTBOUND,tosys,0,mysys,myuser,26,0,0,0,0,0,payload)
+subprocess.call("networkc")
+#subprocess.call("network1")

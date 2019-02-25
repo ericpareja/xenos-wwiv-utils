@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+from struct import *
+from time import *
+from binascii import *
+import sys
+import subprocess
+WWIVNET="/home/xenos/alcove/wwivnet/"
+
+def writepacket(f,tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method,message):
+  wwivpacketformat = "<HHHHHHHIIH"
+  length=len(message)
+  daten=int(time())
+  #print(length)
+  #print(message)
+  packetout=pack(wwivpacketformat,tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method)
+  #print(packetout)
+  packetout=packetout+message
+  #print(packetout)
+  out=open(f,"a")
+  out.write(packetout)
+  out.close
+
+showmessage=0
+
+mysys=60
+myuser=1
+whoto=int(raw_input("Who to send to? "))
+tosys=int(raw_input("On what system? "))
+sender="Xenos #1 @60 Aliens Alcove!"
+date=ctime()
+message="\x034BANG! BANG!\r\n\x034You've been shot by Xenos #1 @60 using wwivbang\r\n\0x030"
+payload="You shot: "+str(whoto)+" @ "+str(tosys)+" using wwivbang!"
+LOCAL=WWIVNET+"local.net"
+OUTBOUND=WWIVNET+"p0.net"
+writepacket(LOCAL,0,1,mysys,myuser,15,0,0,0,0,0,payload)
+writepacket(OUTBOUND,tosys,whoto,mysys,myuser,15,0,0,0,0,0,message)
+subprocess.call("networkc")
+  
+#\nfrom: %d@%d\ntype: %d.%d\nlist_len: %d\ndaten %d\nlength %d\nmethod %d\n" % tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method)
+
+#with open("local.net","bw") as f:
+#    pack(strformat,buffer)=tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method

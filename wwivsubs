@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+from struct import *
+#from time import *
+#from binascii import *
+#import sys
+
+# Processing SUBS.XTR
+print "Processing SUBS.XTR"
+strfile="/home/xenos/alcove/C:/WWIV/DATA/subs.xtr"
+subs_xtr=open(strfile,"r")
+for line in subs_xtr:
+    if line[0]=="!":
+        print("\nSub No. %s" % line[1:-1])
+    if line[0]=="@":
+        print("Description: %s" % line[1:-1])
+    if line[0]=="#":
+        print("Flags: %s" % line[1:-1])
+    if line[0]=="$":
+        network_info=line[1:-1].split(" ")
+        network=network_info[0]
+        subtype=network_info[1]
+        flags=network_info[2]
+        host=network_info[3]
+        category=network_info[4]
+        print("Network: %s" % network)
+        if host == "0":
+		print("Host   : HERE")
+	else:
+		print("Host   : %s" % host)
+
+        print("Subtype: %s" % subtype)
+        print("Category: %s" % category)
+        
+
+# Processing SUBS.DAT
+print "Processing SUBS.DAT"
+strfile="/home/xenos/alcove/C:/WWIV/DATA/subs.dat"
+subs_dat=open(strfile,"rb")
+subs=subs_dat.read()
+number_subs=int(len(subs)/63)
+print("Size of SUBS.DAT: %d" % len(subs))
+print("Number of subs: %d" % number_subs)
+for i in range(0,number_subs):
+    s=subs[i*63:(i*63)+63]
+    print("%d:%d" % (i*63,(i*63)+62))
+    name=str(s[0:40].partition(b'\0')[0])
+    filename=str(s[41:49].partition(b'\0')[0])
+    key=str(s[50])
+    readsl=unpack("B",s[51])
+    postsl=unpack("B",s[52])
+    anony= unpack("B",s[53])
+    age=unpack("B",s[54])
+    maxmsgs=unpack("H",s[55:57])
+    ar=unpack("H",s[57:59])
+    storage_type=unpack("H",s[59:61])
+    type=unpack("H",s[61:63])
+    
+    print("Sub # %i" % i)
+    print("Name: %s" % name)
+    print("Filename: %s" %  filename)
+    print("Key: %s" % key)
+    print("Read SL: %d" % readsl)
+    print("Post SL: %d" % postsl)
+    print("Anony  : %d" % anony)
+    print("Age    : %d" % age)
+    print("Max Msgs: %d" % maxmsgs)
+    print("AR: %d" % ar)
+    print("Storage Type: %d" % storage_type)
+    print("Type: %d" % type)
+
+def get_host(subname):
+    strfile="/home/xenos/alcove/C:/WWIV/DATA/subs.xtr"
+    subs_xtr=open(strfile,"r")
+    for line in subs_xtr:
+        if line[0]=="$":
+            network_info=line[1:-1].split(" ")
+            network=network_info[0]
+            subtype=network_info[1]
+            flags=network_info[2]
+            host=network_info[3]
+            category=network_info[4]
+            if subtype==subname:
+                return host
+
+print("AAGEN is hosted by:")
+print(get_host("AAGEN"))
+print("NETTEST is hosted by:")
+print(get_host("NETTEST"))
+print("WWIVSYS is hosted by:")
+print(get_host("WWIVSYS"))
+print("FSX_GEN is hosted by:")
+print(get_host("FSX_GEN"))
+#print(str(subs[i*63:i*63+62]))
+    
+# from vardec.h subboardrec
+
+#struct subboardrec {
+#  char name[41],                              // board name
+#       filename[9],                            // board database filename
+#       key;                                    // board special key
+#
+#  uint8_t readsl,                       // sl required to read
+#          postsl,                                 // sl required to post
+#          anony,                                  // anonymous board?
+#          age;                                    // minimum age for sub
+#
+#  uint16_t maxmsgs,                     // max # of msgs
+#           ar,                                     // AR for sub-board
+#           storage_type,                           // how messages are stored
+#           type;                                   // 4 digit board type
+#};
+
+
