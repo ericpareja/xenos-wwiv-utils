@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
 //        printf("\x1b[?25l"); //turn cursor off
 		while ( ch = getc(file) ) {
-				if ( ch == EOF ) {
+				if ( ( ch == EOF ) || ( ch == '\032' ) ) {
 						printf("\x1b[0m"); 
 //						printf("\x1b[?25h"); //turn cursor on
 						return(0);
