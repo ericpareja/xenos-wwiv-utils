@@ -18,6 +18,7 @@ import platform
 
 # replace below with the subtype where to post ibbs data to
 sub="IBBSDAT"
+bbsaddress="https://wwivbbs.org"
 
 def get_host(subname):
   subs_json=json.load(open("%s/subs.json" % (wwiv['config']['datadir'])))
@@ -67,7 +68,6 @@ mysys=n['networks'][net]['sysnum']
 doorsys=readdoorsys(sys.argv[3])
 user=doorsys[35].strip()
 city=doorsys[10].strip()
-bbsaddress=(sys.argv[4])
 netdir=n['networks'][net]['dir']
 title=title+"\0"
 sender="ibbslastcall"
