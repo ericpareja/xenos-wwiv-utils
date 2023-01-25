@@ -17,7 +17,7 @@ import json
 import platform
 
 # replace below with the subtype where to post ibbs data to
-sub="IBBSDAT"
+subs={"IBBSDAT","FSX_NET"}
 bbsaddress="https://wwivbbs.org"
 
 def get_host(subname):
@@ -61,22 +61,12 @@ title="ibbslastcall-data"
 networkfile="%s/networks.json" % (wwiv['config']['datadir'])
 n=json.load(open(networkfile,"r"))
 systemname=wwiv['config']['systemname']
-tosys,net=get_host(sub)
-mysys=n['networks'][net]['sysnum']
 doorsys=readdoorsys(sys.argv[1])
 user=doorsys[35].strip()
 city=doorsys[10].strip()
-netdir=n['networks'][net]['dir']
 title=title+"\0"
 sender="ibbslastcall"
 date=ctime()
-print("User:",user)
-print("BBS Name:",systemname)
-print("Date:",strftime("%m/%d/%y"))
-print("Time:",strftime("%H:%M%P"))
-print("City:",city)
-print("OS:",platform.system(),platform.machine())
-print("BBS Address:",bbsaddress)
 m=">>> BEGIN\n"
 m=m+rot47(user)+"\n"                                             # User Handle
 m=m+rot47(systemname)+"\n"                                       # BBS Name
@@ -88,9 +78,13 @@ m=m+rot47(bbsaddress)+"\n"                                       # BBS Address
 m=m+">>> END\n\n"
 m=m+"by wwiv5ibbslastcall"
 message=m.replace("\n","\r\n")
-payload=sub+"\0"+title+sender+"\r\n"+date+"\r\n"+message+"\r\n"
-LOCAL=netdir+"local.net"
-OUTBOUND=netdir+"p0.net"
-writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
-writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
-subprocess.call("networkc")
+for sub in subs:
+  payload=sub+"\0"+title+sender+"\r\n"+date+"\r\n"+message+"\r\n"
+  tosys,net=get_host(sub)
+  mysys=n['networks'][net]['sysnum']
+  netdir=n['networks'][net]['dir']
+  LOCAL=netdir+"local.net"
+  OUTBOUND=netdir+"p0.net"
+  writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
+  writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
+  #subprocess.call("networkc")
