@@ -25,9 +25,7 @@ def get_host(subname):
   for i in subs_json['subs']:
     if len(i['nets'])>0:
       for j in range(len(i['nets'])):
-         print(i['nets'][j]['stype'])
          if i['nets'][j]['stype']==subname:
-            print(i['nets'][j])
             return(int(i['nets'][j]['host']),i['nets'][j]['net_num'])
   return(0)
 
