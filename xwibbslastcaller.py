@@ -16,9 +16,11 @@ import subprocess
 import json
 import platform
 
-# replace below with the subtype where to post ibbs data to
+# replace below with the subtypes where to post ibbs data to
+# the lastcaller script will use the correct network address
 subs={"IBBSDAT","FSX_NET"}
 bbsaddress="https://wwivbbs.org"
+dontshowsl=256
 
 def get_host(subname):
   subs_json=json.load(open("%s/subs.json" % (wwiv['config']['datadir'])))
@@ -27,7 +29,7 @@ def get_host(subname):
       for j in range(len(i['nets'])):
          if i['nets'][j]['stype']==subname:
             return(int(i['nets'][j]['host']),i['nets'][j]['net_num'])
-  return(0)
+  return(-1,-1)
 
 def writepacket(f,tosys,touser,fromsys,fromuser,main_type,minor_type,list_len,daten,length,method,message):
   # wwivpacketformat is the header format
@@ -62,6 +64,10 @@ networkfile="%s/networks.json" % (wwiv['config']['datadir'])
 n=json.load(open(networkfile,"r"))
 systemname=wwiv['config']['systemname']
 doorsys=readdoorsys(sys.argv[1])
+sl=int(doorsys[14].strip())
+if sl>=dontshowsl:
+  print("didn't show this login on ibbslastcallers.\n")
+  quit()
 user=doorsys[35].strip()
 city=doorsys[10].strip()
 title=title+"\0"
@@ -81,10 +87,16 @@ message=m.replace("\n","\r\n")
 for sub in subs:
   payload=sub+"\0"+title+sender+"\r\n"+date+"\r\n"+message+"\r\n"
   tosys,net=get_host(sub)
-  mysys=n['networks'][net]['sysnum']
-  netdir=n['networks'][net]['dir']
-  LOCAL=netdir+"local.net"
-  OUTBOUND=netdir+"p0.net"
-  writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
-  writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
-  #subprocess.call("networkc")
+  if tosys >= 0 :
+    mysys=n['networks'][net]['sysnum']
+    netdir=n['networks'][net]['dir']
+    LOCAL=netdir+"local.net"
+    OUTBOUND=netdir+"p0.net"
+    writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
+    writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
+    subprocess.call("networkc")
+  else:
+    payload=f"\r\nYou aren't subscribed to {sub}.\r\n"
+    # we use the first netdir to send SSM
+    mysys=n['networks'][0]['sysnum']
+    writepacket(n['networks'][0]['dir']+"local.net",mysys,1,mysys,1,15,0,0,0,0,0,payload)
