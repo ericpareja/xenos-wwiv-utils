@@ -14,3 +14,7 @@ i am just starting to help out in the development of WWIV v5.00 bbs
 2014 jun 24
 
 - added wwivcat.cpp - wwivcat will display a file with wwiv color codes
+
+2023 jan 27
+
+- added xwibbslastcaller.py and ibbs-extract3 which add InterBBS LastCaller capabilities to WWIV5.
