@@ -18,7 +18,7 @@ import platform
 
 # replace below with the subtypes where to post ibbs data to
 # the lastcaller script will use the correct network address
-subs={"IBBSDAT","FSX_NET"}
+subs={"IBBSDAT","FSX_DAT"}
 bbsaddress="https://wwivbbs.org"
 dontshowsl=256
 
