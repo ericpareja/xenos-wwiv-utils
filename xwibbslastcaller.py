@@ -15,12 +15,14 @@ import sys
 import subprocess
 import json
 import platform
+import configparser
 
-# replace below with the subtypes where to post ibbs data to
-# the lastcaller script will use the correct network address
-subs={"IBBSDAT","FSX_DAT"}
-bbsaddress="https://wwivbbs.org"
-dontshowsl=256
+# read in wwiv.ini and replace the defaults
+config=configparser.ConfigParser(allow_no_value=True)
+config.read("wwiv.ini")
+bbsaddress=config['wwiv5ibbslastcaller'].get('bbsaddress','https://wwivbbs.org')
+dontshowsl=int(config['wwiv5ibbslastcaller'].get('dontshowsl','256'))
+subs=config['wwiv5ibbslastcaller'].get('subs',"IBBSDAT,FSX_DAT").split(',')
 
 def get_host(subname):
   subs_json=json.load(open("%s/subs.json" % (wwiv['config']['datadir'])))
@@ -65,9 +67,6 @@ n=json.load(open(networkfile,"r"))
 systemname=wwiv['config']['systemname']
 doorsys=readdoorsys(sys.argv[1])
 sl=int(doorsys[14].strip())
-if sl>=dontshowsl:
-  print("didn't show this login on ibbslastcallers.\n")
-  quit()
 user=doorsys[35].strip()
 city=doorsys[10].strip()
 title=title+"\0"
@@ -92,9 +91,10 @@ for sub in subs:
     netdir=n['networks'][net]['dir']
     LOCAL=netdir+"local.net"
     OUTBOUND=netdir+"p0.net"
-    writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
-    writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
-    subprocess.call("networkc")
+    if sl < dontshowsl:
+      writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
+      writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
+      subprocess.call("networkc")
   else:
     payload=f"\r\nYou aren't subscribed to {sub}.\r\n"
     # we use the first netdir to send SSM
