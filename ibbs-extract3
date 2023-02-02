@@ -16,6 +16,10 @@ import re
 import codecs
 import json
 import configparser
+try:
+  from progress.bar import Bar
+except ImportError:
+  Bar=False
 
 # read in wwiv.ini and replace the defaults
 config=configparser.ConfigParser(allow_no_value=True)
@@ -60,7 +64,7 @@ for sub in subs:
     s=""
     l=""
     d=codecs.open(filename,"r","latin_1") # read in messages 
-    e=open(f"{networkdir}laston.txt","w+b")
+    e=open(f"{networkdir}laston.txt","w+b") # get ready to write
     es="|#4%sInterBBS Last Callers for: %s%s|#0\r\n" % (" "*(29-len(networkname)), networkname, " "*(29-(len(networkname)-(len(networkname)%2))))
     e.write(es.encode("latin_1"))
     es="|#7\xB3|#2Name/Handle  |#7\xB3|#2 Time |#7\xB3|#2  Date  |#7\xB3|#2 City                   |#7\xB3|#2 BBS                  |#7\xBA\r\n"
@@ -73,6 +77,8 @@ for sub in subs:
     emit=0
     x=0
     d.seek(0)
+    if Bar:
+      bar=Bar(f"Munching on {networkname}...", max=count)
     for line in d:
       if line==">>> END\r\n":
         emit=-1
@@ -89,7 +95,11 @@ for sub in subs:
         s=str(s)+rot47(line)
         x+=1
       if line==">>> BEGIN\r\n":
+        if Bar:
+          bar.next()
         start+=1
         emit=1
         x=1
     e.write(("|#7\xD4"+("\xCD"*13)+"\xCF"+("\xCD"*6)+"\xCF"+("\xCD"*8)+"\xCF"+("\xCD"*24)+"\xCF"+("\xCD"*22)+"\xBC\r\n").encode("latin_1"))
+    if Bar:
+      bar.finish()

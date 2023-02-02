@@ -60,6 +60,7 @@ def readdoorsys(f):
   doorsys=door.readlines()
   return doorsys
 
+print("\x1b[0;1;36m[\x1b[0;1;44mwwiv5ibbslastcall\x1b[0;1;36m]\x1b[0m [ANSI]")
 wwiv=json.load(open("config.json","r"))
 title="ibbslastcall-data"
 networkfile="%s/networks.json" % (wwiv['config']['datadir'])
@@ -81,7 +82,7 @@ m=m+rot47(city)+"\n"                                             # User City
 m=m+rot47("%s %s" % (platform.system(),platform.machine()))+"\n" # System OS
 m=m+rot47(bbsaddress)+"\n"                                       # BBS Address
 m=m+">>> END\n\n"
-m=m+"by wwiv5ibbslastcall"
+m=m+"by [wwiv5ibbslastcall]"
 message=m.replace("\n","\r\n")
 for sub in subs:
   payload=sub+"\0"+title+sender+"\r\n"+date+"\r\n"+message+"\r\n"
@@ -91,7 +92,7 @@ for sub in subs:
     netdir=n['networks'][net]['dir']
     LOCAL=netdir+"local.net"
     OUTBOUND=netdir+"p0.net"
-    if sl < dontshowsl:
+    if sl < dontshowsl and net >= 0:
       writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
       writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
       subprocess.call("networkc")
