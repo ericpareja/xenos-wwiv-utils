@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 ######################################################################
-# wwiv ibbs-lastcaller-extract:                                      #
+# wwiv ibbs lastcaller extract:                                      #
 #                                                                    #
-# Usage: ibbs-lastcaller-extract <filename>                          #
-#        will read filename and extract all ibbslastcall-data        #
+# Usage: ibbs-extract3.py                                            #
+#        will extract all ibbslastcall-data                          #
 #        encoded in rot47 between MARKERS >>> BEGIN and >>> END      #
-# Copyright (C) 2019 Eric Manuel Pareja                              #
+# Copyright (C) 2019-2023 Eric Manuel Pareja                         #
 ######################################################################
+import codecs
+import configparser
+import json
+import re
+import subprocess
+import sys
+from binascii import *
 from struct import *
 from time import *
-from binascii import *
-import sys
-import subprocess
-import re
-import codecs
-import json
-import configparser
+
 try:
   from progress.bar import Bar
 except ImportError:
@@ -23,13 +24,21 @@ except ImportError:
 ######################################################################
 # read in wwiv.ini and replace the defaults
 config=configparser.ConfigParser(allow_no_value=True)
-config.read("wwiv.ini")
-subs=config['wwiv5ibbslastcaller'].get('subs',"IBBSDAT,FSX_DAT").split(',')
-display=int(config['wwiv5ibbslastcaller'].get('display','11'))
+c=config.read("wwiv.ini")
+if c==['wwiv.ini']:
+  try:
+    subs=config['wwiv5ibbslastcaller'].get('subs',"IBBSDAT,FSX_DAT").split(',')
+    display=int(config['wwiv5ibbslastcaller'].get('display','11'))
+  except KeyError:
+    print("Oops. No wwiv5ibbslastcaller section in wwiv.ini.")
+    exit()
+else:
+  print("Oops. Can't read wwiv.ini.")
+  exit()
 
 ######################################################################
 def get_host(subname):
-  subs_json=json.load(open("%s/subs.json" % (wwiv['config']['datadir'])))
+  subs_json=json.load(open(f"{wwiv['config']['datadir']}/subs.json"))
   for i in subs_json['subs']:
     if len(i['nets'])>0:
       for j in range(len(i['nets'])):
@@ -63,7 +72,7 @@ for sub in subs:
     o=subprocess.run(["wwivutil","messages","dump",filename],capture_output=True)
     lines=o.stdout.decode("latin_1")
     e=open(f"{networkdir}laston.txt","w+b") # get ready to write
-    es="|#4%sInterBBS Last Callers for: %s%s|#0\r\n" % (" "*(29-len(networkname)), networkname, " "*(29-(len(networkname)-(len(networkname)%2))))
+    es=f"|#4{' ' * (29 - len(networkname))}InterBBS Last Callers for: {networkname}{' ' * (29 - (len(networkname) - len(networkname) % 2))}|#0\r\n"
     e.write(es.encode("latin_1"))
     es="|#7\xB3|#2Name/Handle  |#7\xB3|#2 Time |#7\xB3|#2  Date  |#7\xB3|#2 City                   |#7\xB3|#2 BBS                  |#7\xBA\r\n"
     e.write(es.encode("latin_1"))
