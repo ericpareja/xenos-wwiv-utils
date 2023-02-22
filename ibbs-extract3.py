@@ -54,6 +54,8 @@ def rot47(s):
       k=j+47
     if (j>79) and (j<127):
       k=j-47
+    if (k=="|"):
+      k=ord(" ")
     if (k!="\r") and (k!="\n") and k!=13:
       l+=chr(k)
   return str(l)
