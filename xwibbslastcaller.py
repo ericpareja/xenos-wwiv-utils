@@ -89,15 +89,17 @@ for sub in subs:
   tosys,net=get_host(sub)
   if tosys >= 0 :
     mysys=n['networks'][net]['sysnum']
-    netdir=n['networks'][net]['dir']
-    LOCAL=netdir+"local.net"
-    OUTBOUND=netdir+"p0.net"
+    netdir = n['networks'][net]['dir']
+    LOCAL = netdir+"local.net"
+    OUTBOUND = netdir+"p0.net"
     if sl < dontshowsl and net >= 0:
       writepacket(LOCAL,0,0,mysys,1,26,0,0,0,0,0,payload)
-      writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
-      subprocess.call("networkc")
+      if tosys != 0:
+        writepacket(OUTBOUND,tosys,0,mysys,1,26,0,0,0,0,0,payload)
+      #subprocess.call("networkc")
   else:
     payload=f"\r\nYou aren't subscribed to {sub}.\r\n"
     # we use the first netdir to send SSM
     mysys=n['networks'][0]['sysnum']
     writepacket(n['networks'][0]['dir']+"local.net",mysys,1,mysys,1,15,0,0,0,0,0,payload)
+subprocess.call('ibbs-extract3.py')

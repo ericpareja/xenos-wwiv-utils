@@ -17,12 +17,22 @@ from binascii import *
 from struct import *
 from time import *
 
+######################################################################
+# requires python3-progress to be installed for pretty progress bars
+# on debian: apt install python3-progress
+#
+
 try:
   from progress.bar import Bar
 except ImportError:
   Bar=False
+
 ######################################################################
 # read in wwiv.ini and replace the defaults
+#
+# todo: convert this to a .json config so we don't need wwiv.ini
+#
+
 config=configparser.ConfigParser(allow_no_value=True)
 c=config.read("wwiv.ini")
 if c==['wwiv.ini']:
