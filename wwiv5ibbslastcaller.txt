@@ -1,0 +1,239 @@
+README.txt
+
+This is Xenos' WWIV 5 InterBBS Last Callers Scripts
+
+This pair of scripts allows your BBS to generate posts and to process message bases for InterBBS Last Caller posts.
+The first script is xwibbslastcaller.py.
+
+
+
+last callers
+Xenos #1 @60
+Wed Jan 25 03:38:09 2023
+hello all,
+
+here is my xwibbslastcaller.py script.
+
+you can get it from 
+https://github.com/ericpareja/xenos-wwiv-utils/blob/master/xwibbslastcaller.py
+
+if you have problems with it, you can open an issue on github so i can keep
+track.
+
+make sure that you have a running python 3 installation.
+you may have to change the first line to match your environment's needs.
+i can only be sure about linux setups, but it should work on windows with
+little modification.
+
+two things you might need to edit in the script are:
+
+sub="IBBSDAT"
+bbsaddress="https://wwivbbs.org"
+
+change IBBSDAT to the subtype you want xwibbslastcaller.py to post to. it
+will be smart enough to find out what network it is hosted on and who hosts it.
+
+change bbsaddress to your BBS website, or telnet address.
+
+in your wwiv.ini, you should have a LOGON event which can be a batch file or
+shell script. 
+
+whatever method you choose, you can add xwibbslastcaller.py to the script
+but make sure that xwibbslastcaller.py is called with the full path to DOOR.SYS.
+this is the %R passed to the logon.
+
+example entry in WWIV.INI
+
+LOGON_CMD = /home/wwiv/xwibbslastcaller.py %R
+
+for WWIVnet, i started the IBBSDAT sub, hosted @60. this is
+Auto-Requestable. it's an experimental sub for "broadcast" data. feel free
+to subscribe to it before installing xwibbslastcaller.py
+
+this is part 1 of 2 of the wwivibbslastcaller setup. this script is
+reponsible for reading basic info about the caller from DOOR.SYS and posting
+a rot47 encoded message to the IBBSDAT sub. on fsxNet, this would be the
+FSX_DAT echo area.
+
+part 2 of 2 will follow when i've cleaned it up for general consumption. i'm
+having a bit of difficulty making python3 write cp437 characters to a file
+properly. my python2 script to do the extraction of data and generate the
+laston.txt files is in the github.com repo above.
+
+happy hacking! :)
+
+-=<(xenos)>=-
+
+1
+26  A  2.-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-.
+36 /5*6\ 2|4 /\liens' /\lcove! WWIV on Linux, Taguig, Metro Manila, Philippines  2|
+46/ v \2`-=-=-=-=-=-=-=-=-=-=-=-[4 WWIV Development 2]-=-=--=-=-=-=-=-=-=-=-=-=-'
+5
+Re: last callers
+Xenos #1 @60
+Thu Jan 26 17:48:29 2023
+RE: last callers
+BY: Xenos #1 @60
+
+3On 1Wednesday, January 25, 2023 at 03:38, 2Xenos3 wrote:0
+
+1X7>5here is my xwibbslastcaller.py script.0
+1X7>0
+1X7>5you can get it from 0
+1X7>5https://github.com/ericpareja/xenos-wwiv-utils/blob/master/xwibbslastcaller.0
+
+i pushed an update a while ago. the update makes it even easier to use.
+you just add it to your WWIV.INI file or logon batch file with the following
+call.
+
+LOGON_CMD = xwibbslastcaller.py %R
+
+this will take care of posting to the appropriate SUBS on WWIVnet or fsxNet.
+
+in the script itself, there are 3 configurable variables:
+
+subs={"IBBSDAT","FSX_DAT"}
+bbsaddress="https://wwivbbs.org"
+dontshowsl=256
+
+subs contains a list of SUBTYPE (wwivnet) or AREA names (ftn) that the
+ibbslastcaller script will post to. if a new BBS network starts using this,
+please let me know so i can include it.
+
+bbsaddress is a link to your BBS website or telnet address.
+
+dontshowsl is the SL at which the script will NOT post to any of the subs. by
+default, it will post even SYSOP logins. if you don't want this, set the
+dontshowsl=255 for sysop to be invisible or 254 for co-sysops and sysops to be
+invisible.
+
+1
+26  A  2.-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-.
+36 /5*6\ 2|4 /\liens' /\lcove! WWIV on Linux, Taguig, Metro Manila, Philippines  2|
+46/ v \2`-=-=-=-=-=-=-=-=-=-=-=-[4 WWIV Development 2]-=-=--=-=-=-=-=-=-=-=-=-=-'
+5
+Re: part 2 of the wwiv5ibbslastcaller
+Xenos #1 @60
+Thu Jan 26 19:26:14 2023
+RE: part 2 of the wwiv5ibbslastcaller
+BY: Xenos #1 @60
+
+ i've completed 2ibbs-extract30 which you can place in your wwiv base directory.
+running it will read your configs, determine which subs and networks to read
+data from, and write to the appropriate network directories.
+
+you can call it in your script or batch file at least once everytime you want
+the laston.txt files to be updated, either after your caller logs off or you
+can add it to your logon event.
+
+for testing, you can run it in your WWIV directory.
+
+you can get it here:
+
+2https://github.com/ericpareja/xenos-wwiv-utils/blob/master/ibbs-extract30
+
+on windows, you might have to rename the file to 1ibbs-extract3.py0. let me know
+so i can rename it if it's needed.
+
+feedback on this is appreciated.
+
+-=<(xenos)>=-
+
+
+3On 1Thursday, January 26, 2023 at 02:48, 2Xenos3 wrote:0
+
+1X7>5after wrangling over python3 to get the WWIV readable ANSI output for0
+1X7>5lastcallers, i've figured it out. finally!0
+1X7>0
+1X7>5i will tidy up the script to make it as painless to use as possible, then0
+1X7>5upload to my github repository.0
+1X7>0
+1X7>5let me know if you need any help.0
+1
+26  A  2.-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-.
+36 /5*6\ 2|4 /\liens' /\lcove! WWIV on Linux, Taguig, Metro Manila, Philippines  2|
+46/ v \2`-=-=-=-=-=-=-=-=-=-=-=-[4 WWIV Development 2]-=-=--=-=-=-=-=-=-=-=-=-=-'
+5
+Re: last callers ibbs
+Aladdin #1 @63
+Thu Jan 26 23:59:29 2023
+0R 38RC6 - 01/26/23 11:10:24 WWIVnet ->1
+0R 38RC6 - 01/26/23 11:10:23 WWIVnet ->1
+0R 53 - 01/26/23 23:59:54 WWIVnet ->63
+RE: Re: last callers ibbs
+BY: Matthew Munson #1 @815
+
+0PID: WWIV 5.8.0.development
+3On 1Wednesday,January 04, 2023 at 10:49, 2Matthew Munson3 wrote:0
+
+1MM7> 5RE: last callers ibbs0
+1MM7> 0
+1MM7> 5is there a way to get it activated?0
+1MM7> 0
+
+you'll need these.
+
+1) Install Python 3. You can get it here:
+
+    2https://www.python.org/downloads/release/python-3111/0
+
+2) Install xenos' xwibbslastcaller.py and ibbs-extract3
+   Get them it from here:
+
+    2https://github.com/ericpareja/xenos-wwiv-utils0
+
+3) Subscribe to the IBBSDAT SUB @60.
+   Subscribe to the FSX_DAT Echo on fsxNet.
+
+4) Edit xwibbslastcaller.py to suit your needs.
+   Edit ibbs-extract3 to suit your needs.
+
+5) In WWIV.INI, add:
+
+    2LOGON_CMD=xwibbslastcaller.py %R0
+
+
+Note, I don't run Windows so I'm not sure if ibbs-extract3 will run unless you 
+rename it to ibbs-extract3.py.
+
+
+New Instructions for installing WWIV5IBBSLASTCALLERS
+Xenos #1 @60
+Fri Jan 27 23:05:52 2023
+4Instructions for setting up WWIV5IBBSLASTCALLERS0
+
+1) Install Python 3. You can get it here:
+
+    2https://www.python.org/downloads/release/python-3111/0
+
+2) Install xenos' xwibbslastcaller.py and ibbs-extract3
+   Get them from here:
+
+    2https://github.com/ericpareja/xenos-wwiv-utils0
+
+3) Subscribe to the IBBSDAT SUB @60 on WWIVnet.
+   Optional: Subscribe to the FSX_DAT Echo on fsxNet.
+
+4) In WWIV.INI, add:
+
+    2LOGON_CMD=xwibbslastcaller.py %R0
+
+5) Also in WWIV.INI, add:
+
+2[wwiv5ibbslastcaller]0
+2bbsaddress=https://yourbbsurl.here0
+2dontshowsl=2550
+
+If you don't add this section in WWIV.INI, the defaults will be used.
+The default URL in bbsaddress is https://wwivbbs.org.
+By default, even Sysop and Co-Sysop logins are posted to IBBSDAT. Change the
+SL value to the level you want "invisible."  It's up to you what you want. :)
+
+Note, I don't run Windows so I'm not sure if ibbs-extract3 will run unless you
+rename it to ibbs-extract3.py.
+
+1
+26  A  2.-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-.
+36 /5*6\ 2|4 /\liens' /\lcove! WWIV on Linux, Taguig, Metro Manila, Philippines  2|
+46/ v \2`-=-=-=-=-=-=-=-=-=-=-=-[4 WWIV Development 2]-=-=--=-=-=-=-=-=-=-=-=-=-'
+5
